@@ -1,9 +1,6 @@
 import numpy as np
 from sklearn import metrics
-from sklearn.ensemble import RandomForestRegressor
-from scipy import stats
 from sklearn.ensemble import RandomForestClassifier
-import time
 
 
 class ActiveLearner:
@@ -49,8 +46,12 @@ class ActiveLearner:
         m = metrics.confusion_matrix(self.dataset.testLabels,test_prediction)
         
         if 'accuracy' in performanceMeasures:
-            performance['accuracy'] = metrics.accuracy_score(self.dataset.testLabels,test_prediction)
-            
+            performance['accuracy'] = metrics.accuracy_score(self.dataset.testLabels, test_prediction)
+        if 'recall' in performanceMeasures:
+            performance['recall'] = metrics.recall_score(self.dataset.testLabels, test_prediction)
+        if 'precision' in performanceMeasures:
+            performance['precision'] = metrics.precision_score(self.dataset.testLabels, test_prediction)
+
         if 'TN' in performanceMeasures:
             performance['TN'] = m[0,0]
         if 'FN' in performanceMeasures:    
@@ -60,14 +61,20 @@ class ActiveLearner:
         if 'FP' in performanceMeasures:
             performance['FP'] = m[0,1]
             
-        if 'auc' in performanceMeasures:
+        if 'roc_auc' in performanceMeasures:
             test_prediction = self.model.predict_proba(self.dataset.testData)  
             test_prediction = test_prediction[:,1]
-            performance['auc'] = metrics.roc_auc_score(self.dataset.testLabels, test_prediction)
-            
+            performance['roc_auc'] = metrics.roc_auc_score(self.dataset.testLabels, test_prediction)
+
+        if 'prauc' in performanceMeasures:
+            test_prediction = self.model.predict_proba(self.dataset.testData)  
+            test_prediction = test_prediction[:,1]
+            _pre_with, _rec_with, _thr_with = metrics.precision_recall_curve(self.dataset.testLabels, test_prediction)
+            performance['prauc'] = metrics.auc(_rec_with, _pre_with)
+
         return performance
-    
-        
+
+
 class ActiveLearnerRandom(ActiveLearner):
     '''Randomly samples the points'''
     

@@ -11,7 +11,7 @@ class Results:
     def __init__(self, experiment = None, nExperiments = None):
         
         # the performances measures that can be computed
-        self.existingMetrics = ['accuracy', 'auc', 'IoU', 'dice', 'f-measure']
+        self.existingMetrics = ['accuracy', 'roc_auc', 'prauc', 'recall', 'precision', 'IoU', 'dice', 'f-measure']
         
         if experiment is not None:
             experiment.dtstname = experiment.dataset.__class__.__name__
@@ -76,16 +76,24 @@ class Results:
                     plt.figure()
                     i = 0
                     for alearner in self.alearners:
-                        if performanceMeasure=='accuracy' or performanceMeasure=='auc':
+                        if (performanceMeasure=='accuracy' or performanceMeasure=='roc_auc' or
+                            performanceMeasure=='prauc' or performanceMeasure=='recall' or
+                            performanceMeasure=='precision'):
                             avResult = np.mean(self.performances[alearner][performanceMeasure], axis=0)
-                        if performanceMeasure=='auc':
-                            avResult =np.mean(self.performances[alearner]['auc'],axis=(0))
                         if performanceMeasure=='IoU':
-                            avResult =np.mean((self.performances[alearner]['TP']/(self.performances[alearner]['TP']+self.performances[alearner]['FP']+self.performances[alearner]['FN']+small_eps)),axis=(0))
+                            avResult = (np.mean((self.performances[alearner]['TP']/(self.performances[alearner]['TP']
+                                        + self.performances[alearner]['FP'] + self.performances[alearner]['FN']
+                                        + small_eps)), axis=(0)))
                         elif performanceMeasure=='dice':
-                            avResult = np.mean((2*self.performances[alearner]['TP']/(2*self.performances[alearner]['TP']+self.performances[alearner]['FP']+self.performances[alearner]['FN']+small_eps)),axis=(0))
+                            avResult = (
+                                np.mean((2*self.performances[alearner]['TP'] / (2*self.performances[alearner]['TP'] 
+                                         + self.performances[alearner]['FP'] + self.performances[alearner]['FN'] 
+                                         + small_eps)), axis=(0)))
                         elif performanceMeasure=='f-measure':
-                            avResult = np.mean((2*self.performances[alearner]['TP']/(2*self.performances[alearner]['TP']+self.performances[alearner]['FP']+self.performances[alearner]['FN']+small_eps)),axis=(0))
+                            avResult = (
+                                np.mean((2*self.performances[alearner]['TP'] / (2*self.performances[alearner]['TP']
+                                         + self.performances[alearner]['FP'] + self.performances[alearner]['FN']
+                                         + small_eps)), axis=(0)))
                             
                         plt.plot(avResult, color=col(i), label=alearner)
                         i = i+1

@@ -5,9 +5,9 @@ import scipy.io as sio
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import Imputer
+# from sklearn.preprocessing import LabelEncoder
+# from sklearn.preprocessing import StandardScaler
+# from sklearn.impute import SimpleImputer
 
 
 class Dataset:
@@ -183,4 +183,35 @@ class DatasetStriatumMini(Dataset):
         self.testLabels = dt['labels']
         self.testLabels[self.testLabels==-1] = 0
         self.testData = scaler.transform(self.testData)
+
+
+class DatasetMW(Dataset):
+    
+    def __init__(self):
         
+        Dataset.__init__(self)
+        self.trainData = np.loadtxt('train_feature.csv', delimiter=',')
+        self.trainLabels = np.loadtxt('train_label.csv', delimiter=',').reshape(-1, 1)
+                
+        scaler = preprocessing.StandardScaler().fit(self.trainData)
+        self.trainData = scaler.transform(self.trainData)
+        
+        self.testData = np.loadtxt('test_feature.csv', delimiter=',')
+        self.testLabels = np.loadtxt('test_label.csv', delimiter=',').reshape(-1, 1)
+        self.testData = scaler.transform(self.testData)
+
+
+class DatasetMW_X2v(Dataset):
+    
+    def __init__(self):
+        
+        Dataset.__init__(self)
+        self.trainData = np.loadtxt('train_feature_X2v.csv', delimiter=',')
+        self.trainLabels = np.loadtxt('train_label_X2v.csv', delimiter=',').reshape(-1, 1)
+                
+        scaler = preprocessing.StandardScaler().fit(self.trainData)
+        self.trainData = scaler.transform(self.trainData)
+        
+        self.testData = np.loadtxt('test_feature_X2v.csv', delimiter=',')
+        self.testLabels = np.loadtxt('test_label_X2v.csv', delimiter=',').reshape(-1, 1)
+        self.testData = scaler.transform(self.testData)
